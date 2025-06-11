@@ -1,10 +1,19 @@
-FROM maven:3.8.5-openjdk-17-slim AS build
+# Build stage using Java 21
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+
 WORKDIR /app
+
+# Copy everything and build the project
 COPY . .
 RUN mvn clean package -DskipTests
 
-FROM openjdk:17-jdk-slim
-VOLUME /tmp
+# Run stage using Java 21
+FROM eclipse-temurin:21-jdk
+
+WORKDIR /app
+
 COPY --from=build /app/target/calendar-0.0.1-SNAPSHOT.jar app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
