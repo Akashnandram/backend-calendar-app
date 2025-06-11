@@ -15,7 +15,6 @@ public class CalendarColorService {
 
     public List<UiContractHolidayDto> markHolidaysByWeek(List<UiContractHolidayDto> monthDays, List<HolidaysDto> holidays) {
 
-        // Step 1: Map holiday dates to list of festival names
         Map<LocalDate, List<String>> holidayMap = holidays.stream()
                 .collect(Collectors.groupingBy(
                         h -> parseToLocalDate(h.getDate().getIso()),
@@ -24,14 +23,12 @@ public class CalendarColorService {
 
         Map<Integer, List<UiContractHolidayDto>> weeksMap = new HashMap<>();
 
-        // Step 2: Group month days by week
         for (UiContractHolidayDto dto : monthDays) {
             LocalDate date = LocalDate.of(dto.getYear(), dto.getMonth(), dto.getDay());
             int week = date.get(WeekFields.ISO.weekOfMonth());
             weeksMap.computeIfAbsent(week, k -> new ArrayList<>()).add(dto);
         }
 
-        // Step 3: For each week, set colour based on holiday count and assign festivals
         for (Map.Entry<Integer, List<UiContractHolidayDto>> entry : weeksMap.entrySet()) {
             List<UiContractHolidayDto> weekDays = entry.getValue();
 
@@ -39,7 +36,7 @@ public class CalendarColorService {
                     .filter(d -> holidayMap.containsKey(LocalDate.of(d.getYear(), d.getMonth(), d.getDay())))
                     .count();
 
-            String color = "default";
+            String color = "";
             if (holidayCount >= 2) {
                 color = "#BBFFDD";
             } else if (holidayCount == 1) {
